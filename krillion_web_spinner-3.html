@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krillion Web Spinner</title>
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --panel-bg: #111827;
+            --panel-border: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #3b82f6;
+            --web-color: #60a5fa;
+            --rare-gold: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --cute-pink: #f472b6;
+            --cute-purple: #c084fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--web-color);
+            letter-spacing: 1.5px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* CUTE HOME PAGE STYLES */
+        .home-hero {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(192, 132, 252, 0.15));
+            border-radius: 16px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-hero-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .home-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--web-color), var(--cute-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .home-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto 20px;
+            line-height: 1.5;
+        }
+
+        .play-big-btn {
+            background: linear-gradient(135deg, var(--accent), var(--cute-purple));
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .play-big-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(192, 132, 252, 0.6);
+        }
+
+        .how-to-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .how-card {
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .how-card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .how-card h4 {
+            color: var(--web-color);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .how-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* TIMER BAR */
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #1f2937;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--accent);
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        .timer-text {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        /* WEB ANIMATION CANVAS */
+        .web-display-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: #030712;
+            border-radius: 10px;
+            border: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        canvas#webCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .web-status-text {
+            position: absolute;
+            bottom: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+            z-index: 2;
+        }
+
+        .prompt-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button.btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* GAME SUMMARY STYLES */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--web-color);
+            margin-top: 5px;
+        }
+
+        .review-prompt-card {
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .answer-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin: 4px 4px 0 0;
+            background: #1f2937;
+        }
+
+        .answer-tag.user-guessed {
+            background: #1e3a8a;
+            border: 1px solid var(--accent);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .answer-tag.rare-missed {
+            background: #78350f;
+            border: 1px solid var(--rare-gold);
+            color: #fef3c7;
+        }
+
+        /* EDITOR STYLES */
+        .editor-prompt-card {
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .editor-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .editor-row input {
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🕷️ KRILLION WEB SPINNER</h1>
+        <p>Type rare answers to spin massive spider webs!</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tab-home-btn" onclick="switchTab('home')">🏠 Home</button>
+        <button class="tab-btn" id="tab-play-btn" onclick="switchTab('play')">🎮 Play</button>
+        <button class="tab-btn" id="tab-editor-btn" onclick="switchTab('editor')">✏️ Editor</button>
+    </div>
+
+    <!-- CUTE HOME PAGE SECTION -->
+    <div id="section-home" class="view-section active">
+        <div class="home-hero">
+            <div class="home-hero-emoji">🕸️🕷️✨</div>
+            <div class="home-title">Welcome to Web Spinner!</div>
+            <p class="home-subtitle">Uncover rare trivia answers, watch your friendly spider spin dodecagon webs, and see how many feet of web you can weave!</p>
+            <button class="play-big-btn" onclick="switchTab('play')">Start Spinning! 🚀</button>
+        </div>
+
+        <div class="panel">
+            <h3 style="text-align:center; margin-bottom:15px; color:var(--web-color);">✨ How To Play ✨</h3>
+            <div class="how-to-cards">
+                <div class="how-card">
+                    <div class="how-card-icon">⚡</div>
+                    <h4>7-Second Timer</h4>
+                    <p>Think fast! You have 7 seconds per prompt to guess an answer.</p>
+                </div>
+                <div class="how-card">
+                    <div class="how-card-icon">🎯</div>
+                    <h4>Keep Guessing</h4>
+                    <p>If your answer isn't on the list, keep trying until time runs out!</p>
+                </div>
+                <div class="how-card">
+                    <div class="how-card-icon">🕸️</div>
+                    <h4>Spin & Compare</h4>
+                    <p>Rarer answers make longer webs (in feet!). Check your stats at the end.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME PLAY SECTION -->
+    <div id="section-play" class="view-section">
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="prompt-counter" style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;">Prompt 1/2</span>
+                <div class="timer-text" id="timer-text">7.0s</div>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+
+            <h3 id="game-prompt" class="prompt-title">Loading prompt...</h3>
+
+            <!-- ANIMATED SPIDER WEB CANVAS -->
+            <div class="web-display-container">
+                <canvas id="webCanvas"></canvas>
+                <div id="web-status" class="web-status-text">Type an answer!</div>
+            </div>
+
+            <div class="input-box">
+                <input type="text" id="answer-input" placeholder="Type answer here..." autocomplete="off" onkeydown="if(event.key==='Enter') submitAnswer()">
+                <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">Submit</button>
+            </div>
+
+            <button class="btn-primary" id="next-btn" style="width:100%; margin-top:15px; padding:12px; display:none;" onclick="nextPrompt()">Next Prompt ➔</button>
+        </div>
+    </div>
+
+    <!-- END OF GAME SUMMARY SECTION -->
+    <div id="section-summary" class="view-section">
+        <div class="panel">
+            <h2 style="text-align:center; color:var(--web-color); margin-bottom:5px;">🎉 DIVE COMPLETE!</h2>
+            <p style="text-align:center; color:var(--text-muted); font-size:0.95rem;">Here is your performance breakdown for today's run:</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div style="font-size:0.8rem; color:var(--text-muted);">TOTAL WEB SPUN</div>
+                    <div class="stat-value" id="stat-total-feet">0 FT</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size:0.8rem; color:var(--text-muted);">DAILY PERCENTILE</div>
+                    <div class="stat-value" id="stat-percentile" style="color:var(--rare-gold);">Top 0%</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size:0.8rem; color:var(--text-muted);">CORRECT GUESSES</div>
+                    <div class="stat-value" id="stat-correct-count">0/0</div>
+                </div>
+            </div>
+
+            <p id="daily-comparison-msg" style="text-align:center; font-style:italic; margin-bottom:20px; color:var(--text-main);"></p>
+
+            <h3 style="margin-bottom:15px; border-bottom:1px solid var(--panel-border); padding-bottom:8px;">Question & Answer Breakdown:</h3>
+            <div id="summary-breakdown-container"></div>
+
+            <button class="btn-primary" style="width:100%; padding:12px; background:var(--success);" onclick="restartGame()">Play Again 🔄</button>
+        </div>
+    </div>
+
+    <!-- PACK EDITOR SECTION -->
+    <div id="section-editor" class="view-section">
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>Custom Pack Editor</h3>
+                <button class="btn-primary" onclick="addCustomPrompt()">+ Add Question</button>
+            </div>
+            <div id="editor-container"></div>
+            <button class="btn-primary" style="background:var(--success); width:100%; padding:10px;" onclick="saveCustomPacks()">Save Custom Questions</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let customPrompts = JSON.parse(localStorage.getItem('krillion_web_prompts')) || [
+        {
+            question: "Name a well-known ocean creature.",
+            answers: [
+                { text: "shark", rarity: 10 },
+                { text: "dolphin", rarity: 25 },
+                { text: "octopus", rarity: 55 },
+                { text: "anglerfish", rarity: 85 },
+                { text: "giant squid", rarity: 100 }
+            ]
+        },
+        {
+            question: "Name a fruit that grows on a tree.",
+            answers: [
+                { text: "apple", rarity: 15 },
+                { text: "peach", rarity: 40 },
+                { text: "fig", rarity: 75 },
+                { text: "durian", rarity: 95 }
+            ]
+        }
+    ];
+
+    let currentPromptIndex = 0;
+    let canvas, ctx;
+    let animationFrameId = null;
+
+    // Timer variables (7 Seconds)
+    const TOTAL_TIME = 7.0;
+    let timeRemaining = TOTAL_TIME;
+    let timerInterval = null;
+    let isRoundActive = false;
+
+    // Game Session Tracking Data
+    let gameHistory = [];
+
+    window.onload = function() {
+        canvas = document.getElementById('webCanvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        renderEditor();
+    };
+
+    function resizeCanvas() {
+        if (!canvas) return;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        if (!isRoundActive && (!animationFrameId || animationFrameId === null)) {
+            drawSpider(canvas.width / 2, canvas.height / 2);
+        }
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+        
+        if (tab === 'home') {
+            document.getElementById('tab-home-btn').classList.add('active');
+            document.getElementById('section-home').classList.add('active');
+            stopTimer();
+        } else if (tab === 'play') {
+            document.getElementById('tab-play-btn').classList.add('active');
+            document.getElementById('section-play').classList.add('active');
+            resizeCanvas();
+            restartGame();
+        } else if (tab === 'summary') {
+            document.getElementById('section-summary').classList.add('active');
+            stopTimer();
+        } else if (tab === 'editor') {
+            document.getElementById('tab-editor-btn').classList.add('active');
+            document.getElementById('section-editor').classList.add('active');
+            stopTimer();
+        }
+    }
+
+    // --- TIMER LOGIC ---
+    function startTimer() {
+        stopTimer();
+        timeRemaining = TOTAL_TIME;
+        isRoundActive = true;
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            timeRemaining -= 0.1;
+            if (timeRemaining <= 0) {
+                timeRemaining = 0;
+                updateTimerDisplay();
+                handleTimeout();
+            } else {
+                updateTimerDisplay();
+            }
+        }, 100);
+    }
+
+    function stopTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        isRoundActive = false;
+    }
+
+    function updateTimerDisplay() {
+        const bar = document.getElementById('timer-bar');
+        const text = document.getElementById('timer-text');
+        const pct = (timeRemaining / TOTAL_TIME) * 100;
+        
+        bar.style.width = pct + '%';
+        text.textContent = timeRemaining.toFixed(1) + 's';
+
+        if (pct < 30) {
+            bar.style.backgroundColor = 'var(--danger)';
+        } else {
+            bar.style.backgroundColor = 'var(--accent)';
+        }
+    }
+
+    function handleTimeout() {
+        stopTimer();
+        const inputEl = document.getElementById('answer-input');
+        inputEl.disabled = true;
+        document.getElementById('submit-btn').disabled = true;
+
+        document.getElementById('web-status').textContent = "⏱️ Time's Up!";
+        document.getElementById('web-status').style.color = "var(--danger)";
+
+        // Record missed turn
+        const data = customPrompts[currentPromptIndex];
+        gameHistory.push({
+            question: data.question,
+            matchedAnswer: null,
+            rarity: 0,
+            feet: 0,
+            allAnswers: data.answers
+        });
+
+        document.getElementById('next-btn').style.display = "block";
+    }
+
+    // --- GAME ENGINE ---
+    function restartGame() {
+        gameHistory = [];
+        loadPrompt(0);
+    }
+
+    function loadPrompt(idx) {
+        if (idx >= customPrompts.length) {
+            showGameSummary();
+            return;
+        }
+
+        currentPromptIndex = idx;
+        const data = customPrompts[currentPromptIndex];
+
+        document.getElementById('prompt-counter').textContent = `Prompt ${currentPromptIndex + 1}/${customPrompts.length}`;
+        document.getElementById('game-prompt').textContent = data.question;
+        
+        const inputEl = document.getElementById('answer-input');
+        inputEl.value = '';
+        inputEl.disabled = false;
+        setTimeout(() => inputEl.focus(), 100);
+
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('next-btn').style.display = "none";
+        
+        document.getElementById('web-status').textContent = "Type an answer!";
+        document.getElementById('web-status').style.color = "var(--text-main)";
+
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        
+        resizeCanvas();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawSpider(canvas.width / 2, canvas.height / 2);
+
+        startTimer();
+    }
+
+    function submitAnswer() {
+        if (!isRoundActive) return;
+
+        const inputEl = document.getElementById('answer-input');
+        const input = inputEl.value.toLowerCase().trim();
+        if (!input) return;
+
+        const data = customPrompts[currentPromptIndex];
+        const match = data.answers.find(a => a.text.toLowerCase().trim() === input);
+
+        if (match) {
+            stopTimer();
+            inputEl.disabled = true;
+            document.getElementById('submit-btn').disabled = true;
+
+            const rarity = match.rarity;
+            const feetLong = rarity * 5; // 50ft to 500ft length
+
+            // Record successful guess history
+            gameHistory.push({
+                question: data.question,
+                matchedAnswer: match.text,
+                rarity: rarity,
+                feet: feetLong,
+                allAnswers: data.answers
+            });
+
+            const statusEl = document.getElementById('web-status');
+            statusEl.textContent = `🕷️ Spinning web...`;
+            statusEl.style.color = "var(--web-color)";
+
+            // Fast structured dodecagon web animation engine
+            animateSpiderDodecagonWeb(rarity, () => {
+                statusEl.textContent = `🕸️ ${feetLong} FEET LONG WEB! (${rarity}% Rarity)`;
+                statusEl.style.color = "var(--web-color)";
+                document.getElementById('next-btn').style.display = "block";
+            });
+        } else {
+            inputEl.select();
+            
+            const statusEl = document.getElementById('web-status');
+            statusEl.textContent = "❌ Not on the list! Try again!";
+            statusEl.style.color = "var(--danger)";
+
+            animateWrongAnswerShake();
+        }
+    }
+
+    // --- DODECAGON (12-SIDED CIRCULAR) SPIDER WEB ANIMATION ---
+    function animateSpiderDodecagonWeb(rarity, onComplete) {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.min(centerX, centerY) * (0.35 + (rarity / 100) * 0.55);
+
+        const numSides = 12;
+        const numRings = Math.max(3, Math.floor((rarity / 100) * 8));
+        const webColor = '#60a5fa';
+
+        let ringIndex = 1;
+        let sideIndex = 0;
+
+        let completedRingSegments = [];
+        let completedSpokes = [];
+
+        function frame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = webColor;
+            ctx.lineWidth = 1.5;
+
+            completedSpokes.forEach(spoke => {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(spoke.x, spoke.y);
+                ctx.stroke();
+            });
+
+            completedRingSegments.forEach(seg => {
+                ctx.beginPath();
+                ctx.moveTo(seg.x1, seg.y1);
+                ctx.lineTo(seg.x2, seg.y2);
+                ctx.stroke();
+            });
+
+            if (ringIndex <= numRings) {
+                const currentRadius = (maxRadius / numRings) * ringIndex;
+                const angle1 = (Math.PI * 2 / numSides) * sideIndex;
+                const angle2 = (Math.PI * 2 / numSides) * (sideIndex + 1);
+
+                const x1 = centerX + Math.cos(angle1) * currentRadius;
+                const y1 = centerY + Math.sin(angle1) * currentRadius;
+                const x2 = centerX + Math.cos(angle2) * currentRadius;
+                const y2 = centerY + Math.sin(angle2) * currentRadius;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+
+                completedRingSegments.push({ x1, y1, x2, y2 });
+                completedSpokes.push({ x: x1, y: y1 });
+
+                sideIndex++;
+                if (sideIndex >= numSides) {
+                    sideIndex = 0;
+                    ringIndex++;
+                }
+
+                drawSpider(x2, y2);
+                animationFrameId = requestAnimationFrame(frame);
+            } else {
+                drawSpider(centerX, centerY);
+                animationFrameId = null;
+                if (onComplete) onComplete();
+            }
+        }
+
+        // Start animation frame immediately without delay
+        animationFrameId = requestAnimationFrame(frame);
+    }
+
+    function animateWrongAnswerShake() {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        let step = 0;
+
+        function frame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const offsetX = Math.sin(step * 1.5) * 8;
+            drawSpider(centerX + offsetX, centerY);
+            step++;
+            if (step < 12) {
+                animationFrameId = requestAnimationFrame(frame);
+            } else {
+                drawSpider(centerX, centerY);
+                animationFrameId = null;
+            }
+        }
+        animationFrameId = requestAnimationFrame(frame);
+    }
+
+    function drawSpider(x, y) {
+        ctx.fillStyle = "#e5e7eb";
+        ctx.strokeStyle = "#e5e7eb";
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.arc(x, y + 3, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(x, y - 3, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let i = -1; i <= 1; i += 0.66) {
+            ctx.beginPath();
+            ctx.moveTo(x, y - 1);
+            ctx.lineTo(x - 10, y + i * 8);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x, y - 1);
+            ctx.lineTo(x + 10, y + i * 8);
+            ctx.stroke();
+        }
+    }
+
+    function nextPrompt() {
+        loadPrompt(currentPromptIndex + 1);
+    }
+
+    // --- GAME SUMMARY & STATS LOGIC ---
+    function showGameSummary() {
+        switchTab('summary');
+
+        let totalFeet = 0;
+        let totalRarity = 0;
+        let correctCount = 0;
+
+        const breakdownContainer = document.getElementById('summary-breakdown-container');
+        breakdownContainer.innerHTML = '';
+
+        gameHistory.forEach((item, idx) => {
+            if (item.matchedAnswer) {
+                totalFeet += item.feet;
+                totalRarity += item.rarity;
+                correctCount++;
+            }
+
+            const sortedAnswers = [...item.allAnswers].sort((a, b) => b.rarity - a.rarity);
+
+            let answerTagsHtml = '';
+            sortedAnswers.forEach(ans => {
+                const isUserChoice = item.matchedAnswer && item.matchedAnswer.toLowerCase() === ans.text.toLowerCase();
+                const isRarer = item.matchedAnswer ? ans.rarity > item.rarity : true;
+
+                let tagClass = 'answer-tag';
+                if (isUserChoice) tagClass += ' user-guessed';
+                else if (isRarer) tagClass += ' rare-missed';
+
+                answerTagsHtml += `<span class="${tagClass}">${ans.text.toUpperCase()} (${ans.rarity}%)</span>`;
+            });
+
+            breakdownContainer.innerHTML += `
+                <div class="review-prompt-card">
+                    <div style="font-weight:bold; margin-bottom:8px;">Q${idx + 1}: ${item.question}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">
+                        Your Answer: <strong style="color:${item.matchedAnswer ? 'var(--web-color)' : 'var(--danger)'}">
+                            ${item.matchedAnswer ? item.matchedAnswer.toUpperCase() + ' (' + item.feet + ' ft)' : 'None (Missed)'}
+                        </strong>
+                    </div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Available Answers (Rarest Highlighted):</div>
+                    <div>${answerTagsHtml}</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('stat-total-feet').textContent = `${totalFeet} FT`;
+        document.getElementById('stat-correct-count').textContent = `${correctCount}/${gameHistory.length}`;
+
+        const maxPossibleFeet = gameHistory.reduce((acc, h) => {
+            const topAns = Math.max(...h.allAnswers.map(a => a.rarity));
+            return acc + (topAns * 5);
+        }, 0);
+
+        const performancePct = maxPossibleFeet > 0 ? (totalFeet / maxPossibleFeet) * 100 : 0;
+        let percentile = Math.min(99, Math.max(1, Math.round(performancePct * 0.95)));
+
+        document.getElementById('stat-percentile').textContent = `Top ${100 - percentile}%`;
+        document.getElementById('daily-comparison-msg').textContent = 
+            `🔥 You spun more web length than ${percentile}% of players who attempted this pack today!`;
+    }
+
+    // --- EDITOR LOGIC ---
+    function renderEditor() {
+        const container = document.getElementById('editor-container');
+        container.innerHTML = '';
+
+        customPrompts.forEach((p, pIdx) => {
+            let answersHtml = '';
+            p.answers.forEach((a, aIdx) => {
+                answersHtml += `
+                    <div class="editor-row">
+                        <input type="text" value="${a.text}" placeholder="Answer" oninput="customPrompts[${pIdx}].answers[${aIdx}].text=this.value">
+                        <input type="number" value="${a.rarity}" style="width:80px;" placeholder="Rarity %" oninput="customPrompts[${pIdx}].answers[${aIdx}].rarity=parseInt(this.value)||0">
+                        <button class="btn-primary" style="background:var(--danger);" onclick="removeEditorAnswer(${pIdx}, ${aIdx})">✕</button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="editor-prompt-card">
+                    <input type="text" value="${p.question}" style="width:100%; font-weight:bold; margin-bottom:10px;" oninput="customPrompts[${pIdx}].question=this.value">
+                    <div>Answers & Rarity % (1-100%):</div>
+                    ${answersHtml}
+                    <button class="btn-primary" style="margin-top:8px; font-size:0.8rem;" onclick="addEditorAnswer(${pIdx})">+ Add Answer Variant</button>
+                </div>
+            `;
+        });
+    }
+
+    function addEditorAnswer(pIdx) {
+        customPrompts[pIdx].answers.push({ text: "New Answer", rarity: 50 });
+        renderEditor();
+    }
+
+    function removeEditorAnswer(pIdx, aIdx) {
+        customPrompts[pIdx].answers.splice(aIdx, 1);
+        renderEditor();
+    }
+
+    function addCustomPrompt() {
+        customPrompts.push({ question: "New Custom Prompt?", answers: [{ text: "Example", rarity: 50 }] });
+        renderEditor();
+    }
+
+    function saveCustomPacks() {
+        localStorage.setItem('krillion_web_prompts', JSON.stringify(customPrompts));
+        alert('Custom questions saved!');
+        restartGame();
+    }
+</script>
+
+</body>
+</html>
